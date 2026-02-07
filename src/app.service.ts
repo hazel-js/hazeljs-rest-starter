@@ -14,7 +14,7 @@ export class AppService {
       name: 'hazeljs-starter',
       version: '1.0.0',
       framework: 'HazelJS',
-      documentation: '/api-docs',
+      documentation: '/swagger',
       health: '/health',
     };
   }

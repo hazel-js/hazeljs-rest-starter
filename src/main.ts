@@ -4,10 +4,10 @@ import { SwaggerModule } from '@hazeljs/swagger';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = new HazelApp(AppModule);
-
-  // Setup Swagger documentation
+  // Setup Swagger documentation (must be called before app creation)
   SwaggerModule.setRootModule(AppModule);
+
+  const app = new HazelApp(AppModule);
 
   // Enable CORS
   app.enableCors({
