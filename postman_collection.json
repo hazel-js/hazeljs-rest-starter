@@ -134,6 +134,38 @@
       ]
     },
     {
+      "name": "Swagger",
+      "description": "API documentation endpoints",
+      "item": [
+        {
+          "name": "Swagger UI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/swagger",
+              "host": ["{{baseUrl}}"],
+              "path": ["swagger"]
+            },
+            "description": "Interactive Swagger UI documentation page"
+          }
+        },
+        {
+          "name": "OpenAPI Spec (JSON)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/swagger/spec",
+              "host": ["{{baseUrl}}"],
+              "path": ["swagger", "spec"]
+            },
+            "description": "Returns the OpenAPI 3.0 specification as JSON"
+          }
+        }
+      ]
+    },
+    {
       "name": "Health",
       "description": "Health check and readiness probe endpoints",
       "item": [

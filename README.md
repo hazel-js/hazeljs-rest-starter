@@ -46,7 +46,7 @@ npm start
 
 ### API Documentation
 
-Once running, visit [http://localhost:3000/api-docs](http://localhost:3000/api-docs) for interactive Swagger documentation.
+Once running, visit [http://localhost:3000/swagger](http://localhost:3000/swagger) for interactive Swagger documentation. The raw OpenAPI spec is available at [http://localhost:3000/swagger/spec](http://localhost:3000/swagger/spec).
 
 ### Health Checks
 
