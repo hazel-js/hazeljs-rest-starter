@@ -1,0 +1,31 @@
+{
+  "name": "hazeljs-starter",
+  "version": "0.1.0",
+  "description": "HazelJS Starter Application",
+  "author": "",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "dev": "tsc --watch & nodemon dist/main.js",
+    "start:dev": "ts-node src/main.ts",
+    "lint": "eslint \"src/**/*.ts\"",
+    "lint:fix": "eslint \"src/**/*.ts\" --fix",
+    "format": "prettier --write \"src/**/*.ts\""
+  },
+  "dependencies": {
+    "@hazeljs/config": "0.2.0-beta.1",
+    "@hazeljs/core": "0.2.0-beta.1",
+    "@hazeljs/swagger": "0.2.0-beta.1",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.3",
+    "reflect-metadata": "^0.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.50",
+    "nodemon": "^3.1.0",
+    "prettier": "^3.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
