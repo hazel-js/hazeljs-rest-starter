@@ -7,16 +7,18 @@ import {
   Body,
   Param,
   HttpCode,
+  UseGuards,
 } from '@hazeljs/core';
 import { Swagger, ApiOperation } from '@hazeljs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('/users')
 @Swagger({
   title: 'Users',
-  description: 'User management endpoints',
+  description: 'User management endpoints (protected)',
   version: '1.0.0',
 })
 export class UsersController {
@@ -24,10 +26,11 @@ export class UsersController {
 
   @Get()
   @ApiOperation({
-    summary: 'Get all users',
+    summary: 'Get all users (requires auth)',
     tags: ['Users'],
     responses: {
       '200': { description: 'List of all users' },
+      '401': { description: 'Unauthorized' },
     },
   })
   findAll() {
@@ -36,7 +39,7 @@ export class UsersController {
 
   @Get('/:id')
   @ApiOperation({
-    summary: 'Get a user by ID',
+    summary: 'Get a user by ID (requires auth)',
     tags: ['Users'],
     parameters: [
       {
@@ -49,6 +52,7 @@ export class UsersController {
     ],
     responses: {
       '200': { description: 'User found' },
+      '401': { description: 'Unauthorized' },
       '404': { description: 'User not found' },
     },
   })
@@ -59,7 +63,7 @@ export class UsersController {
   @Post()
   @HttpCode(201)
   @ApiOperation({
-    summary: 'Create a new user',
+    summary: 'Create a new user (requires auth)',
     tags: ['Users'],
     requestBody: {
       required: true,
@@ -80,6 +84,7 @@ export class UsersController {
     responses: {
       '201': { description: 'User successfully created' },
       '400': { description: 'Invalid input data' },
+      '401': { description: 'Unauthorized' },
     },
   })
   create(@Body() createUserDto: CreateUserDto) {
@@ -88,7 +93,7 @@ export class UsersController {
 
   @Put('/:id')
   @ApiOperation({
-    summary: 'Update an existing user',
+    summary: 'Update an existing user (requires auth)',
     tags: ['Users'],
     parameters: [
       {
@@ -115,6 +120,7 @@ export class UsersController {
     },
     responses: {
       '200': { description: 'User successfully updated' },
+      '401': { description: 'Unauthorized' },
       '404': { description: 'User not found' },
     },
   })
@@ -124,7 +130,7 @@ export class UsersController {
 
   @Delete('/:id')
   @ApiOperation({
-    summary: 'Delete a user',
+    summary: 'Delete a user (requires auth)',
     tags: ['Users'],
     parameters: [
       {
@@ -137,6 +143,7 @@ export class UsersController {
     ],
     responses: {
       '200': { description: 'User successfully deleted' },
+      '401': { description: 'Unauthorized' },
       '404': { description: 'User not found' },
     },
   })

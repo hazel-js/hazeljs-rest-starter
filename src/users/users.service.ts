@@ -1,63 +1,85 @@
 import { Injectable, NotFoundError } from '@hazeljs/core';
+import { PrismaService } from '@hazeljs/prisma';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 @Injectable()
 export class UsersService {
-  private users: User[] = [];
-  private idCounter = 1;
+  constructor(private readonly prisma: PrismaService) {}
 
-  findAll(): User[] {
-    return this.users;
+  async findAll() {
+    return this.prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
   }
 
-  findOne(id: string): User {
-    const user = this.users.find((u) => u.id === id);
+  async findOne(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
     if (!user) {
       throw new NotFoundError(`User with id "${id}" not found`);
     }
     return user;
   }
 
-  create(createUserDto: CreateUserDto): User {
-    const now = new Date().toISOString();
-    const user: User = {
-      id: String(this.idCounter++),
-      name: createUserDto.name,
-      email: createUserDto.email,
-      createdAt: now,
-      updatedAt: now,
-    };
-    this.users.push(user);
-    return user;
+  async create(createUserDto: CreateUserDto) {
+    return this.prisma.user.create({
+      data: {
+        name: createUserDto.name,
+        email: createUserDto.email,
+        password: createUserDto.password,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
   }
 
-  update(id: string, updateUserDto: UpdateUserDto): User {
-    const user = this.findOne(id);
-    if (updateUserDto.name !== undefined) {
-      user.name = updateUserDto.name;
-    }
-    if (updateUserDto.email !== undefined) {
-      user.email = updateUserDto.email;
-    }
-    user.updatedAt = new Date().toISOString();
-    return user;
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    await this.findOne(id);
+
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        ...(updateUserDto.name !== undefined && { name: updateUserDto.name }),
+        ...(updateUserDto.email !== undefined && {
+          email: updateUserDto.email,
+        }),
+        ...(updateUserDto.password !== undefined && {
+          password: updateUserDto.password,
+        }),
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
   }
 
-  remove(id: string): { deleted: boolean } {
-    const index = this.users.findIndex((u) => u.id === id);
-    if (index === -1) {
-      throw new NotFoundError(`User with id "${id}" not found`);
-    }
-    this.users.splice(index, 1);
+  async remove(id: string) {
+    await this.findOne(id);
+    await this.prisma.user.delete({ where: { id } });
     return { deleted: true };
   }
 }

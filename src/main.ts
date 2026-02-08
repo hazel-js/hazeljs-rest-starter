@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { HazelApp, BuiltInHealthChecks } from '@hazeljs/core';
 import { SwaggerModule } from '@hazeljs/swagger';
+import { PrismaService } from '@hazeljs/prisma';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -19,11 +20,13 @@ async function bootstrap() {
   app.registerHealthCheck(BuiltInHealthChecks.memoryCheck(500));
   app.registerHealthCheck(BuiltInHealthChecks.eventLoopCheck(100));
 
-  // Register graceful shutdown handler
+  // Register graceful shutdown handler for Prisma
+  const prisma = app.getContainer().resolve(PrismaService);
   app.registerShutdownHandler({
-    name: 'cleanup',
+    name: 'database',
     handler: async () => {
-      console.log('Cleaning up resources...');
+      await prisma.$disconnect();
+      console.log('Database connection closed');
     },
     timeout: 5000,
   });

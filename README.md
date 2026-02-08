@@ -6,11 +6,13 @@ A starter application built with [HazelJS](https://hazeljs.com) - the AI-native 
 
 - Decorator-based controllers and services
 - Dependency injection
+- JWT authentication with protected routes
+- PostgreSQL database with Prisma ORM
 - Swagger/OpenAPI documentation
 - Environment configuration
 - Health checks and graceful shutdown
 - CORS support
-- Example Users CRUD module
+- Docker Compose for local development
 
 ## Getting Started
 
@@ -18,11 +20,33 @@ A starter application built with [HazelJS](https://hazeljs.com) - the AI-native 
 
 - Node.js >= 18
 - npm >= 9
+- Docker & Docker Compose (for PostgreSQL)
 
 ### Installation
 
 ```bash
 npm install
+```
+
+### Database Setup
+
+Start PostgreSQL with Docker:
+
+```bash
+docker compose up -d
+```
+
+Generate the Prisma client and run migrations:
+
+```bash
+npm run db:generate
+npm run db:migrate -- --name init
+```
+
+Optionally seed the database:
+
+```bash
+npm run db:seed
 ```
 
 ### Configuration
@@ -62,26 +86,67 @@ src/
 ├── app.module.ts           # Root module
 ├── app.controller.ts       # Root controller
 ├── app.service.ts          # Root service
-└── users/                  # Example Users module
-    ├── users.module.ts     # Module definition
-    ├── users.controller.ts # CRUD endpoints
-    ├── users.service.ts    # Business logic
+├── types/
+│   └── hazeljs-auth.d.ts   # Auth type augmentations
+├── auth/                   # Authentication module
+│   ├── auth.module.ts
+│   ├── auth.controller.ts  # Register, login, profile
+│   ├── auth.service.ts     # JWT + bcrypt logic
+│   └── dto/
+│       ├── register.dto.ts
+│       └── login.dto.ts
+└── users/                  # Users module (protected)
+    ├── users.module.ts
+    ├── users.controller.ts # CRUD endpoints with @Auth
+    ├── users.service.ts    # Prisma-backed service
     └── dto/
         ├── create-user.dto.ts
         └── update-user.dto.ts
+prisma/
+├── schema.prisma           # Database schema
+└── seed.ts                 # Seed script
+docker-compose.yml          # PostgreSQL container
 ```
 
 ## API Endpoints
 
-| Method   | Path          | Description        |
-| -------- | ------------- | ------------------ |
-| `GET`    | `/`           | Welcome message    |
-| `GET`    | `/info`       | Application info   |
-| `GET`    | `/users`      | List all users     |
-| `GET`    | `/users/:id`  | Get user by ID     |
-| `POST`   | `/users`      | Create a new user  |
-| `PUT`    | `/users/:id`  | Update a user      |
-| `DELETE` | `/users/:id`  | Delete a user      |
+### Public
+
+| Method | Path              | Description              |
+| ------ | ----------------- | ------------------------ |
+| `GET`  | `/`               | Welcome message          |
+| `GET`  | `/info`           | Application info         |
+| `POST` | `/auth/register`  | Register a new user      |
+| `POST` | `/auth/login`     | Login, returns JWT token |
+
+### Protected (requires `Authorization: Bearer <token>`)
+
+| Method   | Path              | Description              |
+| -------- | ----------------- | ------------------------ |
+| `GET`    | `/auth/profile`   | Get current user profile |
+| `GET`    | `/users`          | List all users           |
+| `GET`    | `/users/:id`      | Get user by ID           |
+| `POST`   | `/users`          | Create a new user        |
+| `PUT`    | `/users/:id`      | Update a user            |
+| `DELETE` | `/users/:id`      | Delete a user            |
+
+## Authentication Flow
+
+1. **Register** -- `POST /auth/register` with `{ name, email, password }` to create an account and receive an `accessToken`
+2. **Login** -- `POST /auth/login` with `{ email, password }` to get an `accessToken`
+3. **Access protected routes** -- include `Authorization: Bearer <accessToken>` header
+
+## Database Commands
+
+```bash
+npm run db:generate       # Generate Prisma client
+npm run db:migrate        # Create and apply migrations
+npm run db:migrate:deploy # Apply migrations (production)
+npm run db:push           # Push schema without migration
+npm run db:seed           # Seed the database
+npm run db:studio         # Open Prisma Studio GUI
+npm run db:reset          # Reset database and re-apply migrations
+```
 
 ## Adding More Modules
 
